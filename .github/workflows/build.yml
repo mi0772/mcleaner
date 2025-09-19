@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        exclude:
+          - goos: windows
+            goarch: arm64
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Build binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+      run: |
+        mkdir -p dist
+        if [ "$GOOS" = "windows" ]; then
+          go build -o dist/mcleaner-${{ matrix.goos }}-${{ matrix.goarch }}.exe -ldflags="-s -w" .
+        else
+          go build -o dist/mcleaner-${{ matrix.goos }}-${{ matrix.goarch }} -ldflags="-s -w" .
+        fi
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: mcleaner-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: dist/mcleaner-${{ matrix.goos }}-${{ matrix.goarch }}*
