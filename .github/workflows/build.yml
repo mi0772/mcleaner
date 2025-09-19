@@ -11,11 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [linux, windows, darwin]
+        goos: [darwin]
         goarch: [amd64, arm64]
-        exclude:
-          - goos: windows
-            goarch: arm64
 
     steps:
     - uses: actions/checkout@v4
@@ -49,7 +46,7 @@ jobs:
         fi
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: mcleaner-${{ matrix.goos }}-${{ matrix.goarch }}
         path: dist/mcleaner-${{ matrix.goos }}-${{ matrix.goarch }}*

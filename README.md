@@ -167,8 +167,7 @@ This tool modifies and deletes files on your system. While it targets known safe
 
 ## Platform Support
 
-- ✅ macOS (primary target)
-- ✅ Linux (basic support)
-- ⚠️ Windows (limited functionality)
+- ✅ macOS Intel (amd64)
+- ✅ macOS Apple Silicon (arm64)
 
-*Note: This tool is specifically designed for macOS and some features may not work on other platforms.*
+*Note: This tool is specifically designed for macOS only.*

@@ -39,13 +39,10 @@ jobs:
       run: |
         mkdir -p dist
         
-        # Build for multiple platforms
+        # Build for macOS platforms only
         platforms=(
-          "linux/amd64"
-          "linux/arm64"
           "darwin/amd64"
           "darwin/arm64"
-          "windows/amd64"
         )
         
         for platform in "${platforms[@]}"; do
@@ -61,12 +58,8 @@ jobs:
           echo "Building for $GOOS/$GOARCH..."
           env GOOS=$GOOS GOARCH=$GOARCH go build -o dist/$output_name -ldflags="-s -w -X main.version=${GITHUB_REF#refs/tags/}" .
           
-          # Create archives
-          if [ $GOOS = "windows" ]; then
-            zip -j dist/mcleaner-${GOOS}-${GOARCH}.zip dist/$output_name
-          else
-            tar -czf dist/mcleaner-${GOOS}-${GOARCH}.tar.gz -C dist $output_name
-          fi
+          # Create archives (macOS only uses tar.gz)
+          tar -czf dist/mcleaner-${GOOS}-${GOARCH}.tar.gz -C dist $output_name
         done
 
     - name: Generate changelog
@@ -78,7 +71,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          dist/*.zip
           dist/*.tar.gz
         body_path: CHANGELOG.md
         draft: false
